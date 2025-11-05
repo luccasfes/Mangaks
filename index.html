@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leitor de Mangá (Web)</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>MangaVerse</h1>
+            <p>Inspirado no Seita Celestial</p>
+        </header>
+
+        <!-- Menu de Categorias -->
+        <div class="mobile-menu" id="categoriesMenu">
+            <button class="menu-btn active" data-category="latest">📚 Lançamentos</button>
+            <button class="menu-btn" data-category="popular">🔥 Populares</button>
+            <button class="menu-btn" data-category="shounen">⚡ Shounen</button>
+            <button class="menu-btn" data-category="action">💥 Ação</button>
+            <button class="menu-btn" data-category="fantasy">🧙 Fantasia</button>
+            <button class="menu-btn" data-category="romance">💖 Romance</button>
+            <button class="menu-btn" data-category="comedy">😂 Comédia</button>
+            <button class="menu-btn" data-category="horror">👻 Horror</button>
+        </div>
+
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Buscar mangá (ex: One-Punch Man)">
+            <button id="searchButton">Buscar</button>
+        </div>
+
+        <div id="content-title-container">
+            <!-- Título será inserido aqui -->
+        </div>
+        
+        <div id="content-container" class="grid-container">
+            <!-- Conteúdo será inserido aqui -->
+        </div>
+
+        <div id="chapter-container" class="hidden">
+            <button id="backToSearchButton">← Voltar</button>
+            <h2 id="chapter-manga-title"></h2>
+            <div id="chapter-list">
+                <!-- Lista de capítulos será inserida aqui -->
+            </div>
+        </div>
+
+        <div id="reader-container" class="hidden">
+            <button id="backToChaptersButton">← Voltar para os capítulos</button>
+            <h2 id="reader-chapter-title"></h2>
+
+            <div class="reader-nav">
+                <button id="prevChapterBtn" class="reader-nav-btn">Anterior</button>
+                <select id="chapterSelect" class="chapter-select"></select>
+                <button id="nextChapterBtn" class="reader-nav-btn">Próximo</button>
+            </div>
+            
+            <div id="reader-images-container">
+                </div>
+
+            <div class="reader-nav-bottom">
+                <button id="prevChapterBtnBottom" class="reader-nav-btn">Anterior</button>
+                <button id="nextChapterBtnBottom" class="reader-nav-btn">Próximo</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
