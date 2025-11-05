@@ -1,5 +1,5 @@
 // URL base do nosso próprio servidor
-const SERVER_URL = '/api';
+const SERVER_URL = window.location.hostname === 'localhost' ? '/api' : '/api';
 
 // Elementos do HTML
 const searchButton = document.getElementById('searchButton');
