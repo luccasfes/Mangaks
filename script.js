@@ -1,5 +1,5 @@
-// URL base do nosso próprio servidor
-const SERVER_URL = window.location.hostname === 'localhost' ? '/api' : '/api';
+// ATENÇÃO: Configurado para rodar localmente
+const SERVER_URL = 'http://localhost:3000';
 
 // Elementos do HTML
 const searchButton = document.getElementById('searchButton');
@@ -22,19 +22,18 @@ const backToChaptersButton = document.getElementById('backToChaptersButton');
 const readerChapterTitle = document.getElementById('reader-chapter-title');
 const readerImagesContainer = document.getElementById('reader-images-container');
 
-// (NOVOS) Elementos de Navegação do Leitor
+// Elementos de Navegação do Leitor
 const prevChapterBtn = document.getElementById('prevChapterBtn');
 const nextChapterBtn = document.getElementById('nextChapterBtn');
 const chapterSelect = document.getElementById('chapterSelect');
 const prevChapterBtnBottom = document.getElementById('prevChapterBtnBottom');
 const nextChapterBtnBottom = document.getElementById('nextChapterBtnBottom');
 
+// Variáveis de estado para navegação
+let currentMangaChapterList = [];
+let currentChapterIndex = 0;
 
-// (NOVOS) Variáveis de estado para navegação
-let currentMangaChapterList = []; // Guarda a lista de capítulos do mangá atual
-let currentChapterIndex = 0; // Guarda o índice do capítulo que estamos lendo
-
-// Mapeamento de gêneros para IDs do MangaDex
+// Mapeamento de gêneros
 const GENRE_MAP = {
     'shounen': '391b0423-d847-456f-aff0-8b0cfc03066b',
     'action': '391b0423-d847-456f-aff0-8b0cfc03066b',
@@ -64,7 +63,7 @@ backToChaptersButton.addEventListener('click', () => {
     showSection('chapters');
 });
 
-// (NOVOS) Listeners para navegação do leitor
+// Listeners para navegação do leitor
 prevChapterBtn.addEventListener('click', navigateToPreviousChapter);
 nextChapterBtn.addEventListener('click', navigateToNextChapter);
 prevChapterBtnBottom.addEventListener('click', navigateToPreviousChapter);
@@ -79,13 +78,11 @@ chapterSelect.addEventListener('change', (e) => {
 // --- Funções de Navegação ---
 
 function showSection(section) {
-    // Esconde todas as seções
     contentTitleContainer.classList.add('hidden');
     contentContainer.classList.add('hidden');
     chapterContainer.classList.add('hidden');
     readerContainer.classList.add('hidden');
     
-    // Mostra a seção especificada
     switch(section) {
         case 'content':
             contentTitleContainer.classList.remove('hidden');
@@ -98,7 +95,6 @@ function showSection(section) {
             readerContainer.classList.remove('hidden');
             break;
     }
-    
     window.scrollTo(0, 0);
 }
 
@@ -107,15 +103,11 @@ function setupCategoryButtons() {
     
     categoryButtons.forEach(button => {
         button.addEventListener('click', () => {
-            // Remove a classe active de todos os botões
             categoryButtons.forEach(btn => btn.classList.remove('active'));
-            // Adiciona a classe active ao botão clicado
             button.classList.add('active');
             
-            // --- (A CORREÇÃO ESTÁ AQUI) ---
-            // Força a volta para a tela de conteúdo principal
+            // CORREÇÃO: Força a volta para a tela de conteúdo
             showSection('content'); 
-            // --- Fim da correção ---
 
             const category = button.dataset.category;
             loadCategory(category);
@@ -126,6 +118,8 @@ function setupCategoryButtons() {
 function handleSearch() {
     const query = searchInput.value.trim();
     if (query) {
+        // CORREÇÃO: Força a volta para a tela de conteúdo
+        showSection('content');
         searchManga(query);
     }
 }
@@ -283,9 +277,8 @@ function displayChapters(chapterList) {
         return;
     }
 
-    // Ordena capítulos numericamente
     const sortedChapters = chapterList.sort((a, b) => parseFloat(a.attributes.chapter) - parseFloat(b.attributes.chapter));
-    currentMangaChapterList = sortedChapters; // (NOVO) Salva a lista ordenada
+    currentMangaChapterList = sortedChapters; 
 
     sortedChapters.forEach((chapter, index) => {
         let chapNum = chapter.attributes.chapter;
@@ -300,7 +293,6 @@ function displayChapters(chapterList) {
         chapterDiv.innerText = displayText;
 
         chapterDiv.addEventListener('click', () => {
-            // (MUDANÇA) Passa o índice para o leitor
             loadReader(chapter.id, displayText, index);
         });
 
@@ -314,14 +306,13 @@ async function loadReader(chapterId, chapterTitle, index) {
     readerChapterTitle.innerText = chapterTitle;
     readerImagesContainer.innerHTML = '<p class="loading-text">Carregando páginas...</p>';
     
-    currentChapterIndex = index; // (NOVO) Atualiza o índice atual
+    currentChapterIndex = index; 
 
     try {
         const response = await fetch(`${SERVER_URL}/reader/${chapterId}`);
         if (!response.ok) throw new Error('Falha ao buscar o servidor do capítulo');
         const data = await response.json();
         
-        // (NOVO) Configura a navegação antes de mostrar as imagens
         setupReaderNavigation(); 
         displayReaderImages(data);
 
@@ -353,13 +344,11 @@ function displayReaderImages(data) {
     });
 }
 
-// --- (NOVAS FUNÇÕES DE NAVEGAÇÃO) ---
+// --- Funções de Navegação do Leitor ---
 
 function setupReaderNavigation() {
-    // 1. Limpa o select
     chapterSelect.innerHTML = '';
     
-    // 2. Popula o select com os capítulos
     currentMangaChapterList.forEach((chapter, index) => {
         let chapNum = chapter.attributes.chapter;
         let chapTitle = chapter.attributes.title;
@@ -369,17 +358,16 @@ function setupReaderNavigation() {
         }
         
         const option = document.createElement('option');
-        option.value = index; // O valor da option será o índice
+        option.value = index;
         option.innerText = displayText;
         
         if (index === currentChapterIndex) {
-            option.selected = true; // Marca o capítulo atual como selecionado
+            option.selected = true;
         }
         
         chapterSelect.appendChild(option);
     });
     
-    // 3. Habilita/Desabilita os botões de Próximo/Anterior
     prevChapterBtn.disabled = (currentChapterIndex === 0);
     prevChapterBtnBottom.disabled = (currentChapterIndex === 0);
     

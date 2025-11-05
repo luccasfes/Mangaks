@@ -3,7 +3,7 @@
     --card-color: #1a1c2d;
     --text-color: #f0f0f0;
     --text-muted: #a0a0b0;
-    --accent-color: #fd5a5a; /* Mudado de roxo (#9f5afd) para vermelho (#fd5a5a) */
+    --accent-color: #fd5a5a; /* Vermelho */
     --border-color: #2a2d46;
 }
 
@@ -27,7 +27,7 @@ body {
     margin: 0 auto;
 }
 
-/* Header melhorado */
+/* Header */
 header {
     text-align: center;
     margin-bottom: 20px;
@@ -39,7 +39,7 @@ header h1 {
     font-weight: 700;
     font-size: 1.8em;
     margin: 0 0 5px 0;
-    background: linear-gradient(45deg, var(--accent-color), #ff6b6b); /* Mudado para vermelho/rosa */
+    background: linear-gradient(45deg, var(--accent-color), #ff6b6b);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -51,7 +51,7 @@ header p {
     font-size: 0.9em;
 }
 
-/* Menu de navegação mobile */
+/* Menu de navegação */
 .mobile-menu {
     display: flex;
     gap: 8px;
@@ -89,18 +89,12 @@ header p {
     border-color: var(--accent-color);
 }
 
-/* Área de busca melhorada */
+/* Área de busca */
 .search-container {
     display: flex;
     gap: 10px;
     margin-bottom: 20px;
     flex-direction: column;
-}
-
-@media (min-width: 768px) {
-    .search-container {
-        flex-direction: row;
-    }
 }
 
 #searchInput {
@@ -117,7 +111,7 @@ header p {
 
 #searchInput:focus {
     border-color: var(--accent-color);
-    box-shadow: 0 0 10px rgba(253, 90, 90, 0.5); /* Vermelho */
+    box-shadow: 0 0 10px rgba(253, 90, 90, 0.5);
 }
 
 #searchButton {
@@ -134,8 +128,8 @@ header p {
 }
 
 #searchButton:hover {
-    background-color: #e44b4b; /* Vermelho mais escuro */
-    box-shadow: 0 0 10px rgba(253, 90, 90, 0.7); /* Vermelho */
+    background-color: #e44b4b;
+    box-shadow: 0 0 10px rgba(253, 90, 90, 0.7);
 }
 
 /* Títulos de conteúdo */
@@ -147,34 +141,14 @@ header p {
     margin: 20px 0 15px 0;
 }
 
-/* Grid responsivo */
+/* Grid */
 .grid-container {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
     gap: 15px;
 }
 
-@media (min-width: 480px) {
-    .grid-container {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        gap: 18px;
-    }
-}
-
-@media (min-width: 768px) {
-    .grid-container {
-        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-        gap: 20px;
-    }
-}
-
-@media (min-width: 1024px) {
-    .grid-container {
-        grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-    }
-}
-
-/* Cards de mangá melhorados */
+/* Cards de mangá */
 .manga-card {
     background-color: var(--card-color);
     border-radius: 10px;
@@ -190,7 +164,7 @@ header p {
 .manga-card:hover {
     transform: translateY(-5px);
     border-color: var(--accent-color);
-    box-shadow: 0 8px 20px rgba(253, 90, 90, 0.4); /* Vermelho */
+    box-shadow: 0 8px 20px rgba(253, 90, 90, 0.4);
 }
 
 .manga-card img {
@@ -244,7 +218,7 @@ header p {
 #backToSearchButton:hover, #backToChaptersButton:hover {
     background-color: var(--accent-color);
     color: #fff;
-    box-shadow: 0 0 10px rgba(253, 90, 90, 0.5); /* Vermelho */
+    box-shadow: 0 0 10px rgba(253, 90, 90, 0.5);
 }
 
 #chapter-manga-title {
@@ -282,7 +256,7 @@ header p {
     transform: translateX(5px);
 }
 
-/* Leitor responsivo */
+/* Leitor */
 #reader-container {
     width: 100%;
     margin: 0 auto;
@@ -315,7 +289,7 @@ header p {
     border-radius: 4px;
 }
 
-/* Loading states */
+/* Loading */
 .loading {
     opacity: 0.6;
     pointer-events: none;
@@ -329,37 +303,7 @@ header p {
     grid-column: 1 / -1;
 }
 
-/* Menu toggle para mobile */
-.menu-toggle {
-    display: none;
-    background: var(--accent-color);
-    color: white;
-    border: none;
-    padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    width: 100%;
-    font-weight: bold;
-}
-
-@media (max-width: 480px) {
-    body {
-        padding: 10px;
-    }
-    
-    .manga-card img {
-        height: 180px;
-    }
-    
-    .manga-card h3 {
-        font-size: 0.85em;
-    }
-    
-    #chapter-manga-title {
-        font-size: 1.3em;
-    }
-}
-
+/* Navegação do Leitor */
 .reader-nav {
     display: flex;
     justify-content: space-between;
@@ -385,7 +329,7 @@ header p {
 }
 
 .reader-nav-btn:hover {
-    background-color: #e44b4b; /* Vermelho mais escuro */
+    background-color: #e44b4b;
 }
 
 .reader-nav-btn:disabled {
@@ -403,13 +347,10 @@ header p {
     border-radius: 8px;
     font-size: 14px;
     text-align: center;
-    
-    /* --- (NOVAS LINHAS) --- */
-    /* Isso impede o texto de quebrar o layout */
-    min-width: 0; /* Permite que o flexbox encolha o item */
-    overflow: hidden; /* Esconde o texto que vazar */
-    text-overflow: ellipsis; /* Adiciona "..." */
-    white-space: nowrap; /* Garante que o texto fique em uma linha */
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .reader-nav-bottom {
@@ -418,69 +359,56 @@ header p {
     margin-top: 20px;
 }
 
-/* ============================================== */
-/* === (NOVO) CÓDIGO DE RESPONSIVIDADE (CELULAR) === */
-/* ============================================== */
+/* Responsividade */
+@media (min-width: 768px) {
+    .search-container {
+        flex-direction: row;
+    }
+    .grid-container {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 20px;
+    }
+}
 
-/* Regras para qualquer tela MENOR que 768px (tablets e celulares) */
 @media (max-width: 768px) {
-
-    /* Diminui o padding geral do site */
     body {
         padding: 10px;
     }
-
-    /* Diminui os títulos principais */
     header h1 {
         font-size: 1.8em;
     }
     #chapter-manga-title {
-        font-size: 1.5em; /* Título do mangá na pág. de caps */
+        font-size: 1.5em;
     }
     #content-title-container h2 {
-        font-size: 1.4em; /* Título "Últimos Lançamentos" */
+        font-size: 1.4em;
         margin-top: 20px;
     }
-
-    /* Otimiza a barra de busca */
     .search-container {
-        /* Faz o botão ficar embaixo da busca */
         flex-direction: column;
         gap: 12px;
     }
-
-    /* Otimiza a grade de cards */
     .grid-container {
-        /* Tenta encaixar 2 colunas na maioria dos celulares */
         grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-        gap: 10px; /* Espaço menor entre os cards */
+        gap: 10px;
     }
-
     .manga-card img {
-        height: 200px; /* Imagens das capas um pouco menores */
+        height: 200px;
     }
     .manga-card h3 {
-        font-size: 0.9em; /* Título do card menor */
+        font-size: 0.9em;
     }
-
-    /* --- A CORREÇÃO MAIS IMPORTANTE --- */
-    /* Faz a lista de capítulos e o leitor usarem 100% da tela */
-    
     #chapter-list,
     #reader-container {
-        max-width: 100%; /* Remove o limite de 800px */
+        max-width: 100%;
         padding: 5px;
-        box-sizing: border-box; /* Garante que o padding não quebre o layout */
+        box-sizing: border-box;
     }
-
-    /* Faz a imagem do leitor ocupar a tela inteira */
     #reader-container {
-        padding: 0; /* Leitor de ponta a ponta */
+        padding: 0;
         background-color: #000;
         border-radius: 0;
     }
-
-    /* Diminui os botões de capítulo */
     .chapter-item {
         padding: 12px 15px;
         font-size: 0.95em;

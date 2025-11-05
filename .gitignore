@@ -1,13 +1,12 @@
+# Dependências do Node.js
+/node_modules
+/api/node_modules
+
 # Arquivos de Log e Sistema
 *.log
 .DS_Store
 Thumbs.db
 
-# Dependências do Node.js (A pasta que você não quer subir!)
-/node_modules
-/functions/node_modules
-
-# Arquivos do Firebase
+# Arquivos do Firebase (não precisamos mais)
 .firebase/
 firebase-debug.log
-.vercel
