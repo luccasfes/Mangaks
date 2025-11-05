@@ -10,3 +10,4 @@ Thumbs.db
 # Arquivos do Firebase
 .firebase/
 firebase-debug.log
+.vercel
