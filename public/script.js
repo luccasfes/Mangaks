@@ -1,11 +1,10 @@
-// ATENÇÃO: Configurado para rodar localmente
+// ATENÇÃO: Configurado para rodar com o Firebase
 const SERVER_URL = '/api';
 
 // Elementos do HTML
 const searchButton = document.getElementById('searchButton');
 const searchInput = document.getElementById('searchInput');
 const categoriesMenu = document.getElementById('categoriesMenu');
-const downloadPdfBtn = document.getElementById('downloadPdfBtn');
 
 // Áreas de Conteúdo Principal
 const contentTitleContainer = document.getElementById('content-title-container');
@@ -27,9 +26,9 @@ const readerImagesContainer = document.getElementById('reader-images-container')
 const prevChapterBtn = document.getElementById('prevChapterBtn');
 const nextChapterBtn = document.getElementById('nextChapterBtn');
 const chapterSelect = document.getElementById('chapterSelect');
-downloadPdfBtn.addEventListener('click', downloadChapterAsPdf);
 const prevChapterBtnBottom = document.getElementById('prevChapterBtnBottom');
 const nextChapterBtnBottom = document.getElementById('nextChapterBtnBottom');
+const downloadPdfBtn = document.getElementById('downloadPdfBtn'); // Botão PDF
 
 // Variáveis de estado para navegação
 let currentMangaChapterList = [];
@@ -37,12 +36,13 @@ let currentChapterIndex = 0;
 
 // Mapeamento de gêneros
 const GENRE_MAP = {
-    'shounen': '391b0423-d847-456f-aff0-8b0cfc03066b',
-    'action': '391b0423-d847-456f-aff0-8b0cfc03066b',
-    'fantasy': 'cdc58593-87dd-415e-bbc0-2ec27bf404cc',
-    'romance': '423e2eae-a7a2-4a8b-ac03-a8351462d71d',
-    'comedy': '4d32cc48-9f00-4cca-9b5a-a839fce4983b',
-    'horror': 'cdad7e68-1419-41dd-bdce-27753074a640'
+  "shounen": "423e2eae-a7a2-4a8b-ac03-a8351462d71d",
+  "action": "391b0423-d847-456f-aff0-8b0cfc03066b",
+  "fantasy": "cdc58593-87dd-415e-bbc0-2ec27bf404cc",
+  "romance": "423e2eae-a7a2-4a8b-ac03-a8351462d71d", // ERRADO no teu código
+  "comedy": "e5301a23-ebd9-49dd-a0cb-2add944c7fe9", // ID certo
+  "horror": "cdad7e68-1419-41dd-bdce-27753074a640",
+  "isekai": '51d83739-ccd2-4f5a-8523-2d5b164d6aba' // ID certo
 };
 
 // --- Event Listeners ---
@@ -76,6 +76,8 @@ chapterSelect.addEventListener('change', (e) => {
     navigateToChapter(newIndex);
 });
 
+downloadPdfBtn.addEventListener('click', downloadChapterAsPdf);
+
 
 // --- Funções de Navegação ---
 
@@ -108,7 +110,6 @@ function setupCategoryButtons() {
             categoryButtons.forEach(btn => btn.classList.remove('active'));
             button.classList.add('active');
             
-            // CORREÇÃO: Força a volta para a tela de conteúdo
             showSection('content'); 
 
             const category = button.dataset.category;
@@ -120,7 +121,6 @@ function setupCategoryButtons() {
 function handleSearch() {
     const query = searchInput.value.trim();
     if (query) {
-        // CORREÇÃO: Força a volta para a tela de conteúdo
         showSection('content');
         searchManga(query);
     }
@@ -173,6 +173,7 @@ async function loadCategory(category) {
             const genreId = GENRE_MAP[category];
             if (!genreId) {
                 showError('Categoria não encontrada');
+                setLoadingState(false); // <-- Adicionado para parar o loading
                 return;
             }
             
@@ -184,9 +185,7 @@ async function loadCategory(category) {
                 'shounen': '⚡ Shounen',
                 'action': '💥 Ação',
                 'fantasy': '🧙 Fantasia',
-                'romance': '💖 Romance',
-                'comedy': '😂 Comédia',
-                'horror': '👻 Horror'
+                'horror': '👻 Horror',
             };
             
             displayMangaList(data.data, categoryNames[category]);
@@ -244,25 +243,31 @@ function displayMangaList(mangaList, titleText) {
         `;
         
         card.addEventListener('click', () => {
-            loadChapters(manga.id, title);
+            loadChapters(manga.id, title); // Simplificado: removemos a lógica de 'source'
         });
         
         contentContainer.appendChild(card);
     });
 }
 
-async function loadChapters(mangaId, mangaTitle) {
+// REMOVIDO a função 'displayScrapedMangaList'
+
+async function loadChapters(mangaId, mangaTitle) { // Simplificado
     setLoadingState(true, 'chapters');
     showSection('chapters');
     chapterMangaTitle.innerText = mangaTitle;
     chapterListElement.innerHTML = '<p class="loading-text">Carregando capítulos...</p>';
-    currentMangaChapterList = []; // Limpa a lista antiga
+    currentMangaChapterList = []; 
+    
+    const apiUrl = `${SERVER_URL}/chapters/${mangaId}`; // Simplificado
 
     try {
-        const response = await fetch(`${SERVER_URL}/chapters/${mangaId}`);
+        const response = await fetch(apiUrl);
         if (!response.ok) throw new Error('Falha ao buscar capítulos');
         const data = await response.json();
-        displayChapters(data.data);
+        
+        displayChapters(data.data); // Simplificado
+        
     } catch (error) {
         console.error('Erro ao carregar capítulos:', error);
         chapterListElement.innerHTML = '<p class="loading-text" style="color: #ff6b6b;">Erro ao carregar capítulos.</p>';
@@ -271,15 +276,16 @@ async function loadChapters(mangaId, mangaTitle) {
     }
 }
 
-function displayChapters(chapterList) {
+function displayChapters(chapterList) { // Simplificado
     chapterListElement.innerHTML = '';
 
     if (!chapterList || chapterList.length === 0) {
         chapterListElement.innerHTML = '<p class="loading-text">Nenhum capítulo PT-BR encontrado.</p>';
         return;
     }
-
+    
     const sortedChapters = chapterList.sort((a, b) => parseFloat(a.attributes.chapter) - parseFloat(b.attributes.chapter));
+    
     currentMangaChapterList = sortedChapters; 
 
     sortedChapters.forEach((chapter, index) => {
@@ -295,28 +301,30 @@ function displayChapters(chapterList) {
         chapterDiv.innerText = displayText;
 
         chapterDiv.addEventListener('click', () => {
-            loadReader(chapter.id, displayText, index);
+            loadReader(chapter.id, displayText, index); // Simplificado
         });
 
         chapterListElement.appendChild(chapterDiv);
     });
 }
 
-async function loadReader(chapterId, chapterTitle, index) {
+async function loadReader(chapterId, chapterTitle, index) { // Simplificado
     setLoadingState(true, 'reader');
     showSection('reader');
     readerChapterTitle.innerText = chapterTitle;
     readerImagesContainer.innerHTML = '<p class="loading-text">Carregando páginas...</p>';
     
-    currentChapterIndex = index; 
+    currentChapterIndex = index;
+    
+    const apiUrl = `${SERVER_URL}/reader/${chapterId}`; // Simplificado
 
     try {
-        const response = await fetch(`${SERVER_URL}/reader/${chapterId}`);
+        const response = await fetch(apiUrl);
         if (!response.ok) throw new Error('Falha ao buscar o servidor do capítulo');
         const data = await response.json();
         
-        setupReaderNavigation(); 
-        displayReaderImages(data);
+        setupReaderNavigation(); // Simplificado
+        displayReaderImages(data); // Simplificado
 
     } catch (error) {
         console.error('Erro ao carregar imagens:', error);
@@ -326,18 +334,20 @@ async function loadReader(chapterId, chapterTitle, index) {
     }
 }
 
-function displayReaderImages(data) {
+function displayReaderImages(data) { // Simplificado
     readerImagesContainer.innerHTML = '';
-
+    
+    // Padrão (MangaDex)
     const baseUrl = data.baseUrl;
     const chapterHash = data.chapter.hash;
-    const pageFilenames = data.chapter.data;
+    const pageData = data.chapter.data;
+    const pageFilenames = pageData.map(filename => `${baseUrl}/data/${chapterHash}/${filename}`);
 
-    pageFilenames.forEach((filename, index) => {
-        const imageUrl = `${baseUrl}/data/${chapterHash}/${filename}`;
-        
+    pageFilenames.forEach((imageUrl, index) => {
         const img = document.createElement('img');
-        img.src = imageUrl;
+        
+        img.src = imageUrl; // Simplificado
+        
         img.className = 'manga-page-image';
         img.alt = `Página ${index + 1}`;
         img.loading = 'lazy';
@@ -348,7 +358,7 @@ function displayReaderImages(data) {
 
 // --- Funções de Navegação do Leitor ---
 
-function setupReaderNavigation() {
+function setupReaderNavigation() { // Simplificado
     chapterSelect.innerHTML = '';
     
     currentMangaChapterList.forEach((chapter, index) => {
@@ -381,7 +391,7 @@ function navigateToChapter(index) {
     if (index < 0 || index >= currentMangaChapterList.length) return;
     
     const chapter = currentMangaChapterList[index];
-    
+
     let chapNum = chapter.attributes.chapter;
     let chapTitle = chapter.attributes.title;
     let displayText = `Capítulo ${chapNum}`;
@@ -389,7 +399,7 @@ function navigateToChapter(index) {
         displayText += `: ${chapTitle}`;
     }
     
-    loadReader(chapter.id, displayText, index);
+    loadReader(chapter.id, displayText, index); // Simplificado
 }
 
 function navigateToNextChapter() {
@@ -419,17 +429,15 @@ function showError(message) {
 
 // Função auxiliar para carregar a imagem via proxy
 async function fetchImageAsDataURL(originalUrl) {
-    // Usa nossa nova rota /api/proxy
     const proxyUrl = `${SERVER_URL}/proxy?url=${encodeURIComponent(originalUrl)}`;
     const response = await fetch(proxyUrl);
-
+    
     if (!response.ok) {
         throw new Error(`Falha ao buscar imagem: ${response.statusText}`);
     }
-
+    
     const imageBlob = await response.blob();
-
-    // Converte o Blob para DataURL (Base64)
+    
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onloadend = () => resolve(reader.result);
@@ -450,60 +458,70 @@ function getImageDimensions(dataUrl) {
     });
 }
 
+// *** FUNÇÃO MODIFICADA (CORREÇÃO DO PDF) ***
 // Função principal que gera o PDF
 async function downloadChapterAsPdf() {
-    // Pega a biblioteca jsPDF que carregamos no HTML
     const { jsPDF } = window.jspdf;
-
-    // Posição A4 (retrato) em milímetros
+    
     const doc = new jsPDF('p', 'mm', 'a4');
     const pdfWidth = doc.internal.pageSize.getWidth();
     const pdfHeight = doc.internal.pageSize.getHeight();
-    const margin = 10; // margem de 10mm
+    const margin = 10;
     const usableWidth = pdfWidth - (margin * 2);
-
+    
     const images = readerImagesContainer.querySelectorAll('.manga-page-image');
     const title = readerChapterTitle.innerText;
 
-    // Estado de loading
     downloadPdfBtn.disabled = true;
-    downloadPdfBtn.innerText = 'Baixando... (0%)';
-
-    try {
-        for (let i = 0; i < images.length; i++) {
-            const imgElement = images[i];
-            const originalUrl = imgElement.src;
-
-            // Atualiza o progresso
-            downloadPdfBtn.innerText = `Baixando... (${Math.round(((i+1)/images.length) * 100)}%)`;
-
-            // 1. Busca a imagem pelo nosso proxy e converte para DataURL
+    let imagesFailed = 0;
+    
+    for (let i = 0; i < images.length; i++) {
+        downloadPdfBtn.innerText = `Baixando... (${Math.round(((i+1)/images.length) * 100)}%)`;
+        const imgElement = images[i];
+        
+        // ** O TRY/CATCH FOI MOVIDO PARA DENTRO DO LOOP **
+        try {
+            // O '.src' do elemento de imagem já contém a URL correta (direta ou proxy)
+            const originalUrl = imgElement.src; 
+            
+            // 1. Busca a imagem (se for proxy, já está com proxy)
             const dataUrl = await fetchImageAsDataURL(originalUrl);
-
-            // 2. Pega as dimensões da imagem
+            
+            // 2. Pega as dimensões
             const dims = await getImageDimensions(dataUrl);
-
-            // 3. Calcula a altura da imagem no PDF, mantendo a proporção
+            
+            // 3. Calcula a altura
             const imgHeight = (dims.height * usableWidth) / dims.width;
+            
+            // Evita adicionar páginas com altura 0
+            if (imgHeight > 0) {
+                // 4. Adiciona a imagem
+                doc.addImage(dataUrl, 'JPEG', margin, margin, usableWidth, imgHeight);
 
-            // 4. Adiciona a imagem
-            doc.addImage(dataUrl, 'JPEG', margin, margin, usableWidth, imgHeight);
-
-            // 5. Adiciona uma nova página (se não for a última imagem)
-            if (i < images.length - 1) {
-                doc.addPage();
+                // 5. Adiciona nova página
+                if (i < images.length - 1) {
+                    doc.addPage();
+                }
+            } else {
+                console.warn(`Imagem ${i + 1} com altura 0. Pulando...`);
+                imagesFailed++;
             }
+            
+        } catch (error) {
+            // Se falhar (ex: página de créditos bloqueada), avisa no console e pula
+            console.warn(`Falha ao baixar imagem ${i + 1}: ${error.message}. Pulando...`);
+            imagesFailed++;
         }
+    }
 
-        // 6. Salva o PDF
-        doc.save(`${title}.pdf`);
+    // 6. Salva o PDF
+    doc.save(`${title}.pdf`);
 
-    } catch (error) {
-        console.error('Erro ao gerar PDF:', error);
-        alert('Não foi possível gerar o PDF. Tente novamente.');
-    } finally {
-        // Reseta o botão
-        downloadPdfBtn.disabled = false;
-        downloadPdfBtn.innerText = 'Baixar PDF';
+    // Reseta o botão
+    downloadPdfBtn.disabled = false;
+    downloadPdfBtn.innerText = 'Baixar PDF';
+
+    if (imagesFailed > 0) {
+        alert(`PDF salvo! ${imagesFailed} página(s) (como páginas de crédito) não puderam ser baixadas.`);
     }
 }
