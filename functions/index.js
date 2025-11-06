@@ -105,6 +105,22 @@ const main = express();
 // Aplique o CORS no app principal
 main.use(cors());
 
+// ROTA NOVA - Proxy de Imagens
+app.get('/proxy', async (req, res) => {
+    const { url } = req.query;
+    if (!url) {
+        return res.status(400).send('URL da imagem é obrigatória');
+    }
+
+    try {
+        const response = await axios.get(url, { responseType: 'arraybuffer' });
+        res.set('Content-Type', response.headers['content-type']);
+        res.send(response.data);
+    } catch (error) {
+        console.error('Erro no proxy de imagem:', error.message);
+        res.status(500).send('Falha ao buscar imagem');
+    }
+});
 // Diga ao 'main' para usar o seu 'app' antigo, mas no caminho '/api'
 main.use('/api', app);
 

@@ -5,6 +5,7 @@ const SERVER_URL = '/api';
 const searchButton = document.getElementById('searchButton');
 const searchInput = document.getElementById('searchInput');
 const categoriesMenu = document.getElementById('categoriesMenu');
+const downloadPdfBtn = document.getElementById('downloadPdfBtn');
 
 // Áreas de Conteúdo Principal
 const contentTitleContainer = document.getElementById('content-title-container');
@@ -26,6 +27,7 @@ const readerImagesContainer = document.getElementById('reader-images-container')
 const prevChapterBtn = document.getElementById('prevChapterBtn');
 const nextChapterBtn = document.getElementById('nextChapterBtn');
 const chapterSelect = document.getElementById('chapterSelect');
+downloadPdfBtn.addEventListener('click', downloadChapterAsPdf);
 const prevChapterBtnBottom = document.getElementById('prevChapterBtnBottom');
 const nextChapterBtnBottom = document.getElementById('nextChapterBtnBottom');
 
@@ -411,4 +413,97 @@ function setLoadingState(loading, section = 'content') {
 
 function showError(message) {
     contentContainer.innerHTML = `<p class="loading-text" style="color: #ff6b6b;">${message}</p>`;
+}
+
+// --- Funções de Download PDF ---
+
+// Função auxiliar para carregar a imagem via proxy
+async function fetchImageAsDataURL(originalUrl) {
+    // Usa nossa nova rota /api/proxy
+    const proxyUrl = `${SERVER_URL}/proxy?url=${encodeURIComponent(originalUrl)}`;
+    const response = await fetch(proxyUrl);
+
+    if (!response.ok) {
+        throw new Error(`Falha ao buscar imagem: ${response.statusText}`);
+    }
+
+    const imageBlob = await response.blob();
+
+    // Converte o Blob para DataURL (Base64)
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(imageBlob);
+    });
+}
+
+// Função para carregar as dimensões da imagem
+function getImageDimensions(dataUrl) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => {
+            resolve({ width: img.naturalWidth, height: img.naturalHeight });
+        };
+        img.onerror = reject;
+        img.src = dataUrl;
+    });
+}
+
+// Função principal que gera o PDF
+async function downloadChapterAsPdf() {
+    // Pega a biblioteca jsPDF que carregamos no HTML
+    const { jsPDF } = window.jspdf;
+
+    // Posição A4 (retrato) em milímetros
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const pdfWidth = doc.internal.pageSize.getWidth();
+    const pdfHeight = doc.internal.pageSize.getHeight();
+    const margin = 10; // margem de 10mm
+    const usableWidth = pdfWidth - (margin * 2);
+
+    const images = readerImagesContainer.querySelectorAll('.manga-page-image');
+    const title = readerChapterTitle.innerText;
+
+    // Estado de loading
+    downloadPdfBtn.disabled = true;
+    downloadPdfBtn.innerText = 'Baixando... (0%)';
+
+    try {
+        for (let i = 0; i < images.length; i++) {
+            const imgElement = images[i];
+            const originalUrl = imgElement.src;
+
+            // Atualiza o progresso
+            downloadPdfBtn.innerText = `Baixando... (${Math.round(((i+1)/images.length) * 100)}%)`;
+
+            // 1. Busca a imagem pelo nosso proxy e converte para DataURL
+            const dataUrl = await fetchImageAsDataURL(originalUrl);
+
+            // 2. Pega as dimensões da imagem
+            const dims = await getImageDimensions(dataUrl);
+
+            // 3. Calcula a altura da imagem no PDF, mantendo a proporção
+            const imgHeight = (dims.height * usableWidth) / dims.width;
+
+            // 4. Adiciona a imagem
+            doc.addImage(dataUrl, 'JPEG', margin, margin, usableWidth, imgHeight);
+
+            // 5. Adiciona uma nova página (se não for a última imagem)
+            if (i < images.length - 1) {
+                doc.addPage();
+            }
+        }
+
+        // 6. Salva o PDF
+        doc.save(`${title}.pdf`);
+
+    } catch (error) {
+        console.error('Erro ao gerar PDF:', error);
+        alert('Não foi possível gerar o PDF. Tente novamente.');
+    } finally {
+        // Reseta o botão
+        downloadPdfBtn.disabled = false;
+        downloadPdfBtn.innerText = 'Baixar PDF';
+    }
 }
