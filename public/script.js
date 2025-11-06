@@ -1,5 +1,5 @@
 // ATENÇÃO: Configurado para rodar localmente
-const SERVER_URL = 'http://localhost:3000';
+const SERVER_URL = '/api';
 
 // Elementos do HTML
 const searchButton = document.getElementById('searchButton');
