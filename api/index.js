@@ -1,9 +1,9 @@
+const functions = require('firebase-functions'); // ADICIONADO
 const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
 
 const app = express();
-const PORT = 3000;
 
 // URLs da API do MangaDex
 const API_URL = 'https://api.mangadex.org';
@@ -118,7 +118,8 @@ app.get('/reader/:chapterId', async (req, res) => {
     }
 });
 
-// ATENÇÃO: Configurado para rodar localmente
-app.listen(PORT, () => {
-    console.log(`Servidor rodando na porta http://localhost:${PORT}`);
-});
+// ATENÇÃO: Linha removida
+// app.listen(PORT, () => { ... });
+
+// ADICIONADO - Exporta o app Express como uma Cloud Function
+exports.api = functions.https.onRequest(app);
