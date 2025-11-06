@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mangakass</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.3/firebase-app-check-compat.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <div class="container">
         <header>
@@ -31,16 +35,16 @@
         </div>
 
         <div id="content-title-container">
-            </div>
-        
+        </div>
+
         <div id="content-container" class="grid-container">
-            </div>
+        </div>
 
         <div id="chapter-container" class="hidden">
             <button id="backToSearchButton">← Voltar</button>
             <h2 id="chapter-manga-title"></h2>
             <div id="chapter-list">
-                </div>
+            </div>
         </div>
 
         <div id="reader-container" class="hidden">
@@ -53,9 +57,9 @@
                 <button id="nextChapterBtn" class="reader-nav-btn">Próximo</button>
                 <button id="downloadPdfBtn" class="reader-nav-btn">Baixar PDF</button>
             </div>
-            
+
             <div id="reader-images-container">
-                </div>
+            </div>
 
             <div class="reader-nav-bottom">
                 <button id="prevChapterBtnBottom" class="reader-nav-btn">Anterior</button>
@@ -65,5 +69,28 @@
     </div>
 
     <script src="script.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyA-57-nxl0nEhwweVMHyLPaZSiuNj9I0fs",
+            authDomain: "mangakss.firebaseapp.com",
+            projectId: "mangakss",
+            storageBucket: "mangakss.firebasestorage.app",
+            messagingSenderId: "127999453714",
+            appId: "1:127999453714:web:a1be6efc5b9e7622d306cb"
+        };
+
+        // 2. Inicialize o Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        // 3. Inicialize o App Check
+        const appCheck = firebase.appCheck();
+        appCheck.activate(
+
+            '6LeK5wMsAAAAABn6rABcrkmdItvl5db61lJFI7jZ',
+            true
+        );
+    </script>
 </body>
+
 </html>
