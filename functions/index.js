@@ -3,63 +3,52 @@ const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
 
-const app = express(); // Este é o único app que precisamos
-
 // URLs da API do MangaDex
 const API_URL = 'https://api.mangadex.org';
 const COVER_URL = 'https://uploads.mangadex.org';
 
-// --- Middlewares ---
-app.use(cors()); // O Cors fica aqui
+// Este 'app' tem todas as suas rotas (ex: /latest, /popular)
+const app = express();
 app.use(express.json());
 
-// --- Rotas (Endpoints) ---
+// --- ROTAS DO SEU 'app' ---
+// (Copiado de api/index.js)
 
 app.get('/', (req, res) => {
     res.send('Servidor de Mangá rodando!');
 });
 
-// Rota de Gênero
 app.get('/genre/:genre', async (req, res) => {
     const { genre } = req.params;
-    console.log(`Recebido pedido em /genre/${genre}`);
+    const targetUrl = `${API_URL}/manga?includedTags[]=${genre}&availableTranslatedLanguage[]=pt-br&includes[]=cover_art&limit=30&order[followedCount]=desc`;
     try {
-        const targetUrl = `${API_URL}/manga?includedTags[]=${genre}&availableTranslatedLanguage[]=pt-br&includes[]=cover_art&limit=30&order[followedCount]=desc`;
         const response = await axios.get(targetUrl);
         res.json(response.data);
     } catch (error) {
-        console.error(`Erro ao buscar /genre/${genre}:`, error.message);
-        res.status(500).json({ error: 'Erro ao buscar dados do MangaDex' });
+        res.status(500).json({ error: 'Erro ao buscar dados' });
     }
 });
 
-// Rota Popular
 app.get('/popular', async (req, res) => {
-    console.log('Recebido pedido em /popular');
+    const targetUrl = `${API_URL}/manga?order[followedCount]=desc&availableTranslatedLanguage[]=pt-br&includes[]=cover_art&limit=30`;
     try {
-        const targetUrl = `${API_URL}/manga?order[followedCount]=desc&availableTranslatedLanguage[]=pt-br&includes[]=cover_art&limit=30`;
         const response = await axios.get(targetUrl);
         res.json(response.data);
     } catch (error) {
-        console.error('Erro ao buscar /popular:', error.message);
-        res.status(500).json({ error: 'Erro ao buscar dados do MangaDex' });
+        res.status(500).json({ error: 'Erro ao buscar dados' });
     }
 });
 
-// Rota Lançamentos
 app.get('/latest', async (req, res) => {
-    console.log('Recebido pedido em /latest');
+    const targetUrl = `${API_URL}/manga?order[latestUploadedChapter]=desc&availableTranslatedLanguage[]=pt-br&includes[]=cover_art&limit=30`;
     try {
-        const targetUrl = `${API_URL}/manga?order[latestUploadedChapter]=desc&availableTranslatedLanguage[]=pt-br&includes[]=cover_art&limit=30`;
         const response = await axios.get(targetUrl);
         res.json(response.data);
     } catch (error) {
-        console.error('Erro ao buscar /latest:', error.message);
-        res.status(500).json({ error: 'Erro ao buscar dados do MangaDex' });
+        res.status(500).json({ error: 'Erro ao buscar dados' });
     }
 });
 
-// Rota Capas
 app.get('/cover/:mangaId/:coverFileName', async (req, res) => {
     const { mangaId, coverFileName } = req.params;
     const coverUrl = `${COVER_URL}/covers/${mangaId}/${coverFileName}.256.jpg`; 
@@ -68,55 +57,56 @@ app.get('/cover/:mangaId/:coverFileName', async (req, res) => {
         res.set('Content-Type', response.headers['content-type']);
         res.send(response.data);
     } catch (error) {
-        console.error(`Erro ao buscar capa ${coverFileName}:`, error.message);
         res.status(404).send('Capa não encontrada');
     }
 });
 
-// Rota Busca
 app.get('/search', async (req, res) => {
     const query = req.query.q; 
-    console.log(`Recebido pedido em /search com o termo: ${query}`);
     if (!query) {
         return res.status(400).json({ error: 'Termo de busca (q) é obrigatório' });
     }
+    const targetUrl = `${API_URL}/manga?title=${encodeURIComponent(query)}&includes[]=cover_art&availableTranslatedLanguage[]=pt-br`;
     try {
-        const targetUrl = `${API_URL}/manga?title=${encodeURIComponent(query)}&includes[]=cover_art&availableTranslatedLanguage[]=pt-br`;
         const response = await axios.get(targetUrl);
         res.json(response.data);
     } catch (error) {
-        console.error(`Erro ao buscar /search com o termo ${query}:`, error.message);
-        res.status(500).json({ error: 'Erro ao buscar dados do MangaDex' });
+        res.status(500).json({ error: 'Erro ao buscar dados' });
     }
 });
 
-// Rota Capítulos
 app.get('/chapters/:mangaId', async (req, res) => {
     const { mangaId } = req.params;
-    console.log(`Recebido pedido em /chapters para o mangá: ${mangaId}`);
+    const targetUrl = `${API_URL}/manga/${mangaId}/feed?translatedLanguage[]=pt-br&order[chapter]=asc`;
     try {
-        const targetUrl = `${API_URL}/manga/${mangaId}/feed?translatedLanguage[]=pt-br&order[chapter]=asc`;
         const response = await axios.get(targetUrl);
         res.json(response.data);
     } catch (error) {
-        console.error(`Erro ao buscar capítulos para o mangá ${mangaId}:`, error.message);
-        res.status(500).json({ error: 'Erro ao buscar dados do MangaDex' });
+        res.status(500).json({ error: 'Erro ao buscar dados' });
     }
 });
 
-// Rota Leitor
 app.get('/reader/:chapterId', async (req, res) => {
     const { chapterId } = req.params;
-    console.log(`Recebido pedido em /reader para o capítulo: ${chapterId}`);
+    const targetUrl = `${API_URL}/at-home/server/${chapterId}`;
     try {
-        const targetUrl = `${API_URL}/at-home/server/${chapterId}`;
         const response = await axios.get(targetUrl);
         res.json(response.data);
     } catch (error) {
-        console.error(`Erro ao buscar dados do leitor para o capítulo ${chapterId}:`, error.message);
-        res.status(500).json({ error: 'Erro ao buscar dados do MangaDex' });
+        res.status(500).json({ error: 'Erro ao buscar dados' });
     }
 });
 
-// Exporta o app Express como uma Cloud Function
-exports.api = functions.https.onRequest(app);
+// --- FIM DAS ROTAS ---
+
+// Crie um "main" app que o Firebase vai usar
+const main = express();
+
+// Aplique o CORS no app principal
+main.use(cors());
+
+// Diga ao 'main' para usar o seu 'app' antigo, mas no caminho '/api'
+main.use('/api', app);
+
+// Exporte o 'main' app para o Firebase
+exports.api = functions.https.onRequest(main);
